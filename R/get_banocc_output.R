@@ -150,12 +150,12 @@ get_banocc_output <- function(banoccfit, conf_alpha=0.05, get_min_width=FALSE,
 }
 
 get_stanfit <- function(banoccfit){
-    if (class(banoccfit) == "stanfit"){
+    if (methods::is(banoccfit, "stanfit")){
         return(banoccfit)
-    } else if (class(banoccfit) == "list"){
-        banoccfit_class <- unlist(lapply(banoccfit, class))
-        if ("stanfit" %in% banoccfit_class){
-            return(banoccfit[[which(banoccfit_class == "stanfit")]])
+    } else if (methods::is(banoccfit, "list")){
+        banoccfit_class <- unlist(lapply(banoccfit, methods::is, "stanfit"))
+        if (any(banoccfit_class)){
+            return(banoccfit[[which(banoccfit_class)]])
         } else {
             stop("No 'stanfit' object found in 'banoccfit' list.")
         }
@@ -165,13 +165,13 @@ get_stanfit <- function(banoccfit){
 }
 
 get_data <- function(banoccfit){
-    if (class(banoccfit) == "list"){
+    if (methods::is(banoccfit, "list")){
         banoccfit_names <- stringr::str_to_lower(names(banoccfit))
         if ("data" %in% banoccfit_names){
             return(banoccfit[[which(banoccfit_names == "data")]])
         } else {
-            warning(paste0("'banoccfit' given as a list, but no data ",
-                           "element was found to return."))
+            warning("'banoccfit' given as a list, but no data ",
+                    "element was found to return.")
             return(NULL)
         }
     } else {
@@ -186,8 +186,8 @@ check_conf_alpha <- function(conf_alpha, verbose=FALSE, num_level=0){
     }
     conf_alpha_num <- suppressWarnings(as.numeric(conf_alpha))
     if (is.na(conf_alpha_num)){
-        stop(paste0("conf_alpha must be coercible to numeric type. '",
-                    conf_alpha, "' is not."))
+        stop("conf_alpha must be coercible to numeric type. '",
+             conf_alpha, "' is not.")
     }
     return(conf_alpha_num)
 }
